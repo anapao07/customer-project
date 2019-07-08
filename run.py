@@ -15,32 +15,19 @@ def show_menu():
 
 @app.route("/hijo")
 def test(): 
-    
     return render_template("test.html")   
 
-@app.route("/register/<id>",methods=['POST','GET'])
-def register(id):
-    """
-        Inserta 
-    """
-    if id == Null:
-        if request.method == 'POST':
-            name = request.form['name']
-            descrip = request.form['descrip']
-            cant = request.form['cant']
-            dictionary ={"name2":name,"descrip2":descrip,"cant2":cant}
-            insert(dictionary)
-        
-        return render_template("view.html")
-    else:
-        if request.method == 'GET':
-            name = request.form['name']
-            descrip = request.form['descrip']
-            cant = request.form['cant']
-            dictionary_u ={"name2":name,"descrip2":descrip,"cant2":cant}
-            update_product(dictionary_u,id)            
-
-        return render_template("view.html",date = cant[0])    
+@app.route("/register",methods=['POST','GET'])
+def register():
+    
+    if request.method == 'POST':
+        name = request.form['name']
+        descrip = request.form['descrip']
+        cant = request.form['cant']
+        dictionary ={"name2":name,"descrip2":descrip,"cant2":cant}
+        insert(dictionary)
+    return render_template("view.html")
+   
 
 @app.route("/register2",methods=['POST','GET'])
 def register2():
@@ -53,7 +40,6 @@ def register2():
         dire = request.form['dire']
         dictionary2 ={"name1":name,"rfc1":rfc,"city1":city,"dire1":dire}
         insert2(dictionary2)
-    
     return render_template("view2.html")
 
 def get_data_cus():
@@ -140,50 +126,104 @@ def delete_product(id):
         
     return redirect(url_for('show_menu'))
 
-
-def delete_costomer(idc):    
+@app.route('/deletec/<id>',methods=['GET', 'POST'])
+def delete_costomer(id):    
     try:
         conn = connection_db()
         c = conn.cursor()
         sentencia = "DELETE FROM customer WHERE id = ?;"
-        c.execute(sentencia, [idc])
+        c.execute(sentencia, [id])
         conn.commit()
-        print("Se elimino")    
+        print("Se elimino")
     except Exception as e:
         print(e)
     finally:
         conn.close()
+        
+    return redirect(url_for('show_menu'))
 
-def update_product(dictionary_u,id):
 
+
+@app.route('/edit/<id>', methods = ['POST', 'GET'])
+def get_product(id):
     try:
         conn = connection_db()
         c = conn.cursor()
-        nombre = dictionary['name2']
-        descripcion = dictionary['descrip2']
-        cantidad = dictionary['cant2']
-        sentencia = "UPDATE producto SET nombre = ?, descripcion = ?, cantidad = ? WHERE id = ?;"
-        c.execute(sentencia, [nombre, descripcion, cantidad, idt])
-        conn.commit()
-        print("Datos guardados")
+        sent = "SELECT * FROM producto WHERE id = ?;"
+        c.execute(sent, [id])
+        data = c.fetchall()
+        conn.close()
+        print(data[0])
+        
     except Exception as e:
         print(e)
     finally:
         conn.close()
+    return render_template('products_update.html', product = data[0])
+   
 
-def update_customer():
+@app.route('/update/<id>', methods=['POST'])
+def update_product(id):
 
+    try:
+       
+        if request.method == 'POST':
+            name = request.form['name']
+            descrip = request.form['descrip']
+            cant = request.form['cant']
+           
+
+            dictionary_product ={"name2":name,"descrip2":descrip,"cant2":cant}
+            conn = connection_db()
+            c = conn.cursor()
+            sentencia = "UPDATE producto SET nombre = ?, descripcion = ?, cantidad = ? WHERE id = ?;"
+            c.execute(sentencia, [name,descrip,cant,id])
+            conn.commit()
+            print("Datos guardados")
+    except Exception as e:
+        print(e)
+    finally:
+        conn.close()
+    return redirect(url_for('show_menu'))    
+
+@app.route('/editcust/<id>', methods = ['POST', 'GET'])
+def get_customer(id):
     try:
         conn = connection_db()
         c = conn.cursor()
-        sentencia = "UPDATE customer SET nombre = ?, rfc = ?, ciudad = ? , direccion = ? WHERE id = ?;"
-        c.execute(sentencia, [nombre, descripcion, cantidad, idt])
-        conn.commit()
-        print("Datos guardados")
+        sent = "SELECT * FROM customer WHERE id = ?;"
+        c.execute(sent, [id])
+        data = c.fetchall()
+        conn.close()
+        print(data[0])
+        
     except Exception as e:
         print(e)
     finally:
         conn.close()
+    return render_template('customer_update.html', customert = data[0])
+
+@app.route('/updatec/<id>', methods=['POST'])
+def update_customer(id):
+
+    try:
+       
+        if request.method == 'POST':
+            name = request.form['name']
+            rfc = request.form['rfc']
+            city = request.form['city']
+            dire = request.form['dire']
+            conn = connection_db()
+            c = conn.cursor()
+            sentencia = "UPDATE customer SET nombre = ?, rfc = ?, ciudad = ? , direccion = ?  WHERE id = ?;"
+            c.execute(sentencia, [name, rfc, city, dire, id])
+            conn.commit()
+            print("Datos guardados")
+    except Exception as e:
+        print(e)
+    finally:
+        conn.close()
+    return redirect(url_for('show_menu'))  
 
 
 
