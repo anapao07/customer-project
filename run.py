@@ -1,5 +1,6 @@
 from flask import Flask,request
 from flask import render_template
+from flask import redirect, url_for
 import sqlite3 
 
 app = Flask(__name__)
@@ -13,24 +14,33 @@ def show_menu():
                                                                
 
 @app.route("/hijo")
-def test():    
-  
+def test(): 
     
     return render_template("test.html")   
 
-@app.route("/register",methods=['POST','GET'])
-def register():
+@app.route("/register/<id>",methods=['POST','GET'])
+def register(id):
     """
         Inserta 
     """
-    if request.method == 'POST':
-        name = request.form['name']
-        descrip = request.form['descrip']
-        cant = request.form['cant']
-        dictionary ={"name2":name,"descrip2":descrip,"cant2":cant}
-        insert(dictionary)
-    
-    return render_template("view.html")
+    if id == Null:
+        if request.method == 'POST':
+            name = request.form['name']
+            descrip = request.form['descrip']
+            cant = request.form['cant']
+            dictionary ={"name2":name,"descrip2":descrip,"cant2":cant}
+            insert(dictionary)
+        
+        return render_template("view.html")
+    else:
+        if request.method == 'GET':
+            name = request.form['name']
+            descrip = request.form['descrip']
+            cant = request.form['cant']
+            dictionary_u ={"name2":name,"descrip2":descrip,"cant2":cant}
+            update_product(dictionary_u,id)            
+
+        return render_template("view.html",date = cant[0])    
 
 @app.route("/register2",methods=['POST','GET'])
 def register2():
@@ -114,19 +124,22 @@ def connection_db():
     conn = sqlite3.connect('sql/producto.db')
     return conn
 
-
-def delete_product(idp):
+@app.route('/delete/<id>',methods=['GET', 'POST'])
+def delete_product(id):
     try:
         conn = connection_db()
         c = conn.cursor()
         sentencia = "DELETE FROM producto WHERE id = ?;"
-        c.execute(sentencia, [idp])
+        c.execute(sentencia, [id])
         conn.commit()
         print("Se elimino")
     except Exception as e:
         print(e)
     finally:
         conn.close()
+        
+    return redirect(url_for('show_menu'))
+
 
 def delete_costomer(idc):    
     try:
@@ -141,11 +154,14 @@ def delete_costomer(idc):
     finally:
         conn.close()
 
-def update_product():
+def update_product(dictionary_u,id):
 
     try:
         conn = connection_db()
         c = conn.cursor()
+        nombre = dictionary['name2']
+        descripcion = dictionary['descrip2']
+        cantidad = dictionary['cant2']
         sentencia = "UPDATE producto SET nombre = ?, descripcion = ?, cantidad = ? WHERE id = ?;"
         c.execute(sentencia, [nombre, descripcion, cantidad, idt])
         conn.commit()
