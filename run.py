@@ -14,6 +14,7 @@ def show_menu():
 
 @app.route("/hijo")
 def test():    
+    print("Agrege un print")
     
     return render_template("test.html")   
 
