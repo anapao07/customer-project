@@ -46,7 +46,13 @@ def register2():
 
 
 
-
+@app.route("/funcion",methods=['POST','GET'])
+def fc():
+    lista = request.form.getlist('ids_select')
+    lista2 = request.form.getlist('ids_select', type=int)
+    print(lista2)
+    print(lista)
+    return redirect(url_for('show_menu'))
 
 def get_data_cus():
     try:
@@ -98,6 +104,22 @@ def get_product_cust(id):
         print(e)
     finally:                                                                
         conn.close()
+
+
+def get_product_p(id):
+    try:
+        conn = connection_db()
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        sentencia = "SELECT nombre FROM producto WHERE id NOT IN (" \
+        +"SELECT product_id FROM custom_prod WHERE customer_id = ?)"
+        c.execute(sentencia, [id])
+        rows_rest = c.fetchall()
+        return rows_rest
+    except Exception as e:
+        print(e)
+    finally:                                                                
+        conn.close()        
 
 def get_data_cp():
     try:
@@ -240,7 +262,7 @@ def update_product(id):
 @app.route('/editcust/<id>', methods = ['POST', 'GET'])
 def get_customer(id):
     try:
-        sqli_products_1 = get_data_pro()
+        sqli_product_rest = get_product_p(id)
         sqli_pdc = get_product_cust(id)
         conn = connection_db()
         c = conn.cursor()
@@ -250,7 +272,7 @@ def get_customer(id):
         conn.close()
         print(data[0])
         return render_template('customer_update.html', customert = data[0],
-         rows = sqli_products_1, rows_pd = sqli_pdc)
+         rows = sqli_product_rest, rows_pd = sqli_pdc)
     except Exception as e:
         print(e)
     finally:
@@ -282,14 +304,6 @@ def update_customer(id):
     finally:
         conn.close()
     return redirect(url_for('show_menu'))  
-
-# @app.route('/list/<lt>')
-# def ids_select(lt)
-
-
-
-
-
 
 if __name__ == "__main__":
     app.run()
