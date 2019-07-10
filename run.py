@@ -10,7 +10,9 @@ app = Flask(__name__)
 def show_menu():    
     sqli_products_1 = get_data_pro()
     sqli_customer_1 = get_data_cus()
-    return render_template("index.html",rows1 = sqli_products_1,rows = sqli_customer_1)   
+    sqli_cp = get_data_cp()
+    return render_template("index.html",rows1 = sqli_products_1,
+    rows = sqli_customer_1,row_cp = sqli_cp)   
                                                                
 
 @app.route("/hijo")
@@ -42,12 +44,21 @@ def register2():
         insert2(dictionary2)
     return render_template("view2.html")
 
+
+
+
+
 def get_data_cus():
     try:
         conn = connection_db()
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        c.execute("select * from customer")
+        c.execute(
+        "select c.id, c.nombre as cliente, c.rfc, c.ciudad,c.direccion," \
+        +"count(p.nombre) as producto , sum(p.cantidad) as total from " \
+        +"custom_prod as cp left join  customer as c on  c.id = cp.customer_id " \
+        +"left join producto as p on cp.product_id = p.id group by cliente"
+        )
         rows_customer= c.fetchall()
         return rows_customer
         
@@ -72,6 +83,38 @@ def get_data_pro():
     finally:                                                                
         conn.close()
 
+def get_product_cust(id):
+    try:
+        conn = connection_db()
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        sentencia = "select p.nombre as producto " \
+        +"from custom_prod AS cp left join  customer as c on " \
+        +"c.id = cp.customer_id left join producto as p " \
+        +"on cp.product_id = p.id where c.id = ?;"
+        c.execute(sentencia, [id])
+        rows_prod_cust = c.fetchall()
+        return rows_prod_cust
+    except Exception as e:
+        print(e)
+    finally:                                                                
+        conn.close()
+
+def get_data_cp():
+    try:
+        conn = connection_db()
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        c.execute("select c.nombre as cliente,p.nombre as producto from custom_prod AS cp left join  customer as c on  c.id = cp.customer_id left join producto as p on cp.product_id = p.id")
+        row_cp = c.fetchall()
+        return row_cp
+
+    except Exception as e:
+        print(e)
+    finally:                                                                
+        conn.close()
+
+
 
 def insert(dictionary):
     try:
@@ -93,7 +136,7 @@ def insert2(dictionary2):
     try:
         conn = connection_db()
         c = conn.cursor()
-        nombre = dictionary2['name1']
+        nombre = dictionary2['name1'] 
         rfc = dictionary2['rfc1']
         ciudad = dictionary2['city1']
         direccion = dictionary2['dire1']
@@ -105,6 +148,15 @@ def insert2(dictionary2):
         conn.close()
     
     return render_template("view2.html")
+def insert_cost_prod():
+    try:
+        conn = connection_db()
+        c = conn.cursor()
+   
+    except Exception as e:
+        print(e)
+    finally:
+        conn.close()
 
 def connection_db():
     conn = sqlite3.connect('sql/producto.db')
@@ -189,6 +241,8 @@ def update_product(id):
 @app.route('/editcust/<id>', methods = ['POST', 'GET'])
 def get_customer(id):
     try:
+        sqli_products_1 = get_data_pro()
+        sqli_pdc = get_product_cust(id)
         conn = connection_db()
         c = conn.cursor()
         sent = "SELECT * FROM customer WHERE id = ?;"
@@ -196,12 +250,17 @@ def get_customer(id):
         data = c.fetchall()
         conn.close()
         print(data[0])
-        
+        return render_template('customer_update.html', customert = data[0],
+         rows = sqli_products_1, rows_pd = sqli_pdc)
     except Exception as e:
         print(e)
     finally:
         conn.close()
-    return render_template('customer_update.html', customert = data[0])
+    
+
+
+
+
 
 @app.route('/updatec/<id>', methods=['POST'])
 def update_customer(id):
@@ -224,6 +283,9 @@ def update_customer(id):
     finally:
         conn.close()
     return redirect(url_for('show_menu'))  
+
+# @app.route('/list/<lt>')
+# def ids_select(lt)
 
 
 
