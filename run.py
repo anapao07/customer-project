@@ -67,7 +67,6 @@ def get_data_cus():
     finally:                                                                
         conn.close()
 
-
 def get_data_pro():
     
     try:
