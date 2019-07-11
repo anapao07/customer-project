@@ -46,13 +46,29 @@ def register2():
 
 
 
-@app.route("/funcion",methods=['POST','GET'])
-def fc():
-    lista = request.form.getlist('ids_select')
-    lista2 = request.form.getlist('ids_select', type=int)
-    print(lista2)
+@app.route("/funcion/<id>",methods=['POST','GET'])
+def fc(id):
+    lista = request.form.getlist('ids_select', type = int)
+    insert_product_customer(id,lista)
     print(lista)
+    
     return redirect(url_for('show_menu'))
+
+def insert_product_customer(id,lista): 
+     try:
+        conn = connection_db()
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        for ids in lista:
+            c.execute(f"insert  into custom_prod(product_id, customer_id) values ({ids},{id})")
+            print("insertado")   
+            conn.commit()
+
+     except Exception as e:
+         print(e)
+     finally:
+         conn.close()
+    
 
 def get_data_cus():
     try:
@@ -93,7 +109,7 @@ def get_product_cust(id):
         conn = connection_db()
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        sentencia = "select p.nombre as producto " \
+        sentencia = "select c.id as idcliente, p.id, p.nombre as producto " \
         +"from custom_prod AS cp left join  customer as c on " \
         +"c.id = cp.customer_id left join producto as p " \
         +"on cp.product_id = p.id where c.id = ?;"
@@ -111,7 +127,7 @@ def get_product_p(id):
         conn = connection_db()
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        sentencia = "SELECT nombre FROM producto WHERE id NOT IN (" \
+        sentencia = "SELECT id,nombre FROM producto WHERE id NOT IN (" \
         +"SELECT product_id FROM custom_prod WHERE customer_id = ?)"
         c.execute(sentencia, [id])
         rows_rest = c.fetchall()
@@ -126,7 +142,10 @@ def get_data_cp():
         conn = connection_db()
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
-        c.execute("select c.nombre as cliente,p.nombre as producto from custom_prod AS cp left join  customer as c on  c.id = cp.customer_id left join producto as p on cp.product_id = p.id")
+        c.execute("select c.nombre as cliente, p.nombre as producto " \
+        +"from custom_prod AS cp left join  customer as c " \
+        +"on  c.id = cp.customer_id left join producto as p " \
+        +"on cp.product_id = p.id")
         row_cp = c.fetchall()
         return row_cp
 
@@ -144,8 +163,10 @@ def insert(dictionary):
         nombre = dictionary['name2']
         descripcion = dictionary['descrip2']
         cantidad = dictionary['cant2']
-        c.execute(f"INSERT INTO producto(nombre,descripcion,cantidad) values ('{nombre}','{descripcion}',{cantidad})")
+        c.execute(f"INSERT INTO producto(nombre,descripcion,cantidad) " /
+        +"values ('{nombre}','{descripcion}',{cantidad})")
         conn.commit()
+        
     except Exception as e:
         print(e)
     finally:
@@ -161,7 +182,8 @@ def insert2(dictionary2):
         rfc = dictionary2['rfc1']
         ciudad = dictionary2['city1']
         direccion = dictionary2['dire1']
-        c.execute(f"INSERT INTO customer(nombre,rfc,ciudad,direccion) values ('{nombre}','{rfc}','{ciudad}','{direccion}')")
+        c.execute(f"INSERT INTO customer(nombre,rfc,ciudad,direccion) " \
+        +"values ('{nombre}','{rfc}','{ciudad}','{direccion}')")
         conn.commit()
     except Exception as e:
         print(e)
