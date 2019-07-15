@@ -5,19 +5,14 @@ import sqlite3
 
 app = Flask(__name__)
 
-
 @app.route("/")
 def show_menu():    
     sqli_products_1 = get_data_pro()
     sqli_customer_1 = get_data_cus()
     sqli_cp = get_data_cp()
+    sqli_customer = get_data_customer()
     return render_template("index.html",rows1 = sqli_products_1,
-    rows = sqli_customer_1,row_cp = sqli_cp)   
-                                                               
-
-@app.route("/hijo")
-def test(): 
-    return render_template("test.html")   
+    rows = sqli_customer_1,row_cp = sqli_cp,rows_c = sqli_customer)                                                                  
 
 @app.route("/register",methods=['POST','GET'])
 def register():
@@ -44,8 +39,6 @@ def register2():
         insert2(dictionary2)
     return render_template("view2.html")
 
-
-
 @app.route("/funcion/<id>",methods=['POST','GET'])
 def fc(id):
     lista = request.form.getlist('ids_select', type = int)
@@ -63,12 +56,10 @@ def insert_product_customer(id,lista):
             c.execute(f"insert  into custom_prod(product_id, customer_id) values ({ids},{id})")
             print("insertado")   
             conn.commit()
-
      except Exception as e:
          print(e)
      finally:
-         conn.close()
-    
+         conn.close()  
 
 def get_data_cus():
     try:
@@ -103,6 +94,20 @@ def get_data_pro():
         print(e)
     finally:                                                                
         conn.close()
+def get_data_customer():
+    
+    try:
+        conn = connection_db()
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        c.execute("select * from customer")
+        rows_products = c.fetchall()
+        return rows_products
+        
+    except Exception as e:
+        print(e)
+    finally:                                                                
+        conn.close()        
 
 def get_product_cust(id):
     try:
@@ -120,7 +125,6 @@ def get_product_cust(id):
         print(e)
     finally:                                                                
         conn.close()
-
 
 def get_product_p(id):
     try:
@@ -154,8 +158,6 @@ def get_data_cp():
     finally:                                                                
         conn.close()
 
-
-
 def insert(dictionary):
     try:
         conn = connection_db()
@@ -163,8 +165,7 @@ def insert(dictionary):
         nombre = dictionary['name2']
         descripcion = dictionary['descrip2']
         cantidad = dictionary['cant2']
-        c.execute(f"INSERT INTO producto(nombre,descripcion,cantidad) " /
-        +"values ('{nombre}','{descripcion}',{cantidad})")
+        c.execute(f"INSERT INTO producto(nombre,descripcion,cantidad) values ('{nombre}','{descripcion}',{cantidad})")
         conn.commit()
         
     except Exception as e:
@@ -182,8 +183,7 @@ def insert2(dictionary2):
         rfc = dictionary2['rfc1']
         ciudad = dictionary2['city1']
         direccion = dictionary2['dire1']
-        c.execute(f"INSERT INTO customer(nombre,rfc,ciudad,direccion) " \
-        +"values ('{nombre}','{rfc}','{ciudad}','{direccion}')")
+        c.execute(f"INSERT INTO customer(nombre,rfc,ciudad,direccion)values ('{nombre}','{rfc}','{ciudad}','{direccion}')")
         conn.commit()
     except Exception as e:
         print(e)
@@ -191,6 +191,7 @@ def insert2(dictionary2):
         conn.close()
     
     return render_template("view2.html")
+
 def insert_cost_prod():
     try:
         conn = connection_db()
@@ -237,8 +238,6 @@ def delete_costomer(id):
         
     return redirect(url_for('show_menu'))
 
-
-
 @app.route('/edit/<id>', methods = ['POST', 'GET'])
 def get_product(id):
     try:
@@ -257,22 +256,21 @@ def get_product(id):
     return render_template('products_update.html', product = data[0])
    
 
-@app.route('/update/<id>', methods=['POST'])
-def update_product(id):
+@app.route('/update', methods=['POST'])
+def update_product():
 
     try:
        
         if request.method == 'POST':
+            idpro=request.form['idp']
             name = request.form['name']
             descrip = request.form['descrip']
             cant = request.form['cant']
-           
-
             dictionary_product ={"name2":name,"descrip2":descrip,"cant2":cant}
             conn = connection_db()
             c = conn.cursor()
             sentencia = "UPDATE producto SET nombre = ?, descripcion = ?, cantidad = ? WHERE id = ?;"
-            c.execute(sentencia, [name,descrip,cant,id])
+            c.execute(sentencia, [name,descrip,cant,idpro])
             conn.commit()
             print("Datos guardados")
     except Exception as e:
@@ -300,16 +298,10 @@ def get_customer(id):
     finally:
         conn.close()
     
-
-
-
-
-
 @app.route('/updatec/<id>', methods=['POST'])
 def update_customer(id):
 
     try:
-       
         if request.method == 'POST':
             name = request.form['name']
             rfc = request.form['rfc']
