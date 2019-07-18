@@ -2,6 +2,9 @@ from flask import Flask,request
 from flask import render_template
 from flask import redirect, url_for
 import sqlite3 
+import matplotlib.pyplot as plt
+import numpy as np
+
 
 app = Flask(__name__)
 
@@ -9,12 +12,12 @@ app = Flask(__name__)
 def show_menu():    
     sqli_products_1 = get_data_pro()
     sqli_customer_1 = get_data_cus()
-    sqli_cp = get_data_cp()
+    
     sqli_customer = get_data_customer()
     return render_template("index.html",rows1 = sqli_products_1,
-    rows = sqli_customer_1,row_cp = sqli_cp,rows_c = sqli_customer)                                                                  
+    rows = sqli_customer_1,rows_c = sqli_customer)                                                                  
 
-@app.route("/register",methods=['POST','GET'])
+@app.route("/newproducts",methods=['POST','GET'])
 def register():
     
     if request.method == 'POST':
@@ -23,10 +26,11 @@ def register():
         cant = request.form['cant']
         dictionary ={"name2":name,"descrip2":descrip,"cant2":cant}
         insert(dictionary)
-    return render_template("view.html")
+       
+    return render_template("new_products.html")
    
 
-@app.route("/register2",methods=['POST','GET'])
+@app.route("/newcustomers",methods=['POST','GET'])
 def register2():
     """
     """
@@ -37,7 +41,7 @@ def register2():
         dire = request.form['dire']
         dictionary2 ={"name1":name,"rfc1":rfc,"city1":city,"dire1":dire}
         insert2(dictionary2)
-    return render_template("view2.html")
+    return render_template("new_customers.html")
 
 @app.route("/funcion/<id>",methods=['POST','GET'])
 def fc(id):
@@ -60,7 +64,7 @@ def insert_product_customer(id,lista):
          print(e)
      finally:
          conn.close()  
-
+@app.route("/assignation")
 def get_data_cus():
     try:
         conn = connection_db()
@@ -73,13 +77,14 @@ def get_data_cus():
         +"left join producto as p on cp.product_id = p.id group by cliente"
         )
         rows_customer= c.fetchall()
-        return rows_customer
+        return render_template("assignation.html",rows = rows_customer)
         
     except Exception as e:
         print(e)
     finally:                                                                
         conn.close()
 
+@app.route("/products")
 def get_data_pro():
     
     try:
@@ -88,12 +93,14 @@ def get_data_pro():
         c = conn.cursor()
         c.execute("select * from producto")
         rows_products = c.fetchall()
-        return rows_products
+        return render_template("products.html",rows_p = rows_products)
         
     except Exception as e:
         print(e)
     finally:                                                                
         conn.close()
+
+@app.route("/customers")       
 def get_data_customer():
     
     try:
@@ -101,8 +108,8 @@ def get_data_customer():
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
         c.execute("select * from customer")
-        rows_products = c.fetchall()
-        return rows_products
+        rows_customer = c.fetchall()
+        return render_template("customers.html",rows_c = rows_customer)
         
     except Exception as e:
         print(e)
@@ -151,7 +158,7 @@ def get_data_cp():
         +"on  c.id = cp.customer_id left join producto as p " \
         +"on cp.product_id = p.id")
         row_cp = c.fetchall()
-        return row_cp
+        return render_template("assignation.html",rows = row_cp)
 
     except Exception as e:
         print(e)
@@ -220,7 +227,7 @@ def delete_product(id):
     finally:
         conn.close()
         
-    return redirect(url_for('show_menu'))
+    return redirect(url_for('get_data_pro'))
 
 @app.route('/deletec/<id>',methods=['GET', 'POST'])
 def delete_costomer(id):    
@@ -235,6 +242,7 @@ def delete_costomer(id):
         print(e)
     finally:
         conn.close()
+    return render_template("customers.html")    
         
     return redirect(url_for('show_menu'))
 
@@ -317,7 +325,63 @@ def update_customer(id):
         print(e)
     finally:
         conn.close()
-    return redirect(url_for('show_menu'))  
+    return redirect(url_for('show_menu')) 
+
+@app.route('/fig')
+def graphical_products():
+    try:
+        conn = connection_db()
+        c = conn.cursor()
+        conn.row_factory = lambda cursor, row: row[0]
+        cantidad = c.execute('select cantidad value from producto').fetchall()
+        c = c.execute("SELECT nombre FROM producto")
+        lab =c.fetchall()
+        sizes = cantidad
+        fig1, ax1 = plt.subplots()
+        ax1.pie(sizes,labels=lab,autopct='%1.0f%%',shadow=True, startangle=100)
+        plt.savefig("static/image/productsc.png")
+    except Exception as e:
+        print(e)
+    finally:
+        conn.close()
+
+@app.route('/grafi')
+def graphical_productsb():
+    try:
+        conn = connection_db()
+        c = conn.cursor()
+        cantidad = c.execute('select cantidad value from producto').fetchall()
+        c = c.execute("SELECT nombre FROM producto")
+        lab =c.fetchall()
+        labels = lab
+        products = cantidad
+        x = np.arange(len(labels))  # the label locations
+        width = 0.35  # the width of the bars
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(x - width/2, products, width, label='Productos')
+        # Add some text for labels, title and custom x-axis tick labels, etc.
+        ax.set_ylabel('Cantidades')
+        ax.set_title('Productos')
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels)
+        ax.legend()
+        for rect in rects1:
+            height = rect.get_height()
+            ax.annotate('{}'.format(height),
+            xy=(rect.get_x() + rect.get_width() / 2, height),
+            xytext=(0, 3),  # 3 points vertical offset
+            textcoords="offset points",
+            ha='center', va='bottom')
+            fig.tight_layout()
+            plt.savefig("static/image/productsb.png")
+
+
+    except Exception as e:
+        print(e)
+    finally:
+        conn.close()
+
+
 
 if __name__ == "__main__":
     app.run()
