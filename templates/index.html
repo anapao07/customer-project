@@ -1,90 +1,29 @@
 <!DOCTYPE html>
 <html>
-    <head>
-            <title>productos y clientes</title>
-
-<script>
-
-function alerta()
-    {
-    var mensaje;
-    var opcion = confirm(" Eliminar");
-    if (opcion == true) {
-        mensaje = "Has clickado OK";
-	} else {
-	    mensaje = "Has clickado Cancelar";
-	}
-	
-}
-
-
-
-
-</script>
-    </head>
-
+<head>
+<title>productos y clientes</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" media="screen" href = "{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}">
+<script type="text/javascript" src="{{ url_for('static', filename='js/fuctions.js') }}"></script>
+</head>
 <body>
-    <center> <h2>Bienvenidos</h2>
-    <h2>Lista de Productos y Clientes</h2>
-   
-    <h3></h3>
-</center> 
-
-<div>
-
-     
-        <button onclick="location.href='/register'" >Registrar Productos</button>
-        <button onclick="location.href='/register2'">Registrar Clientes</button>
+<div class="sidenav">
+      <a href="/">Menu</a><br>
+      <a href="/products">Productos</a><br>
+      <a href="/customers">Clientes</a><br>
+      <a href="/assignation">Asignación</a>
 </div>
-<p></p>
-
-<table border = 1 align="left">
-        <thead>
-           <td>Id</td>
-           <td>Nombre</td>
-           <td>Descripción</td>
-           <td>cantidad</td>
-           <td></td>
-        </thead>
-
-        
-        {% for row1 in rows1 %}
-           <tr>
-               <td><a href="/register">{{row1["id"]}}</a></td>
-              <td>{{row1["nombre"]}}</td>
-              <td>{{row1["descripcion"]}}</td>
-              <td>{{ row1["cantidad"]}}</td>
-              <td><button onclick="alerta()">Eliminar</button></td>
-        
-        
-           </tr>
-        {% endfor %}
-     </table>
 
 
-     <table border = 1 align="center">
-            <thead>
-               <td>Nombre</td>
-               <td>RFC</td>
-               <td>Ciudad</td>
-               <td>Diracción</td>
-               <td></td>
-            </thead>
-            
-            {% for row in rows %}
-               <tr>
-                  <td><a href="/register2">{{row["nombre"]}}</a></td>
-                  <td>{{row["rfc"]}}</td>
-                  <td>{{ row["ciudad"]}}</td>
-                  <td>{{ row["direccion"]}}</td>
-                  <td><button onclick="alerta()">Eliminar</button></td>
-            
-               </tr>
-            {% endfor %}
-         </table>
+<div class = "container" id="container">{% block container %}Principal{% endblock %}
+<div class="col-xs-6">
+
+</div>
+
+
+ 
+</div>      
    
-  <p></p>
-
 
 </body>
 </html>

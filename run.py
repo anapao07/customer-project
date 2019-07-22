@@ -2,6 +2,7 @@ from flask import Flask,request
 from flask import render_template
 from flask import redirect, url_for
 import sqlite3 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -12,7 +13,6 @@ app = Flask(__name__)
 def show_menu():    
     sqli_products_1 = get_data_pro()
     sqli_customer_1 = get_data_cus()
-    
     sqli_customer = get_data_customer()
     return render_template("index.html",rows1 = sqli_products_1,
     rows = sqli_customer_1,rows_c = sqli_customer)                                                                  
@@ -91,6 +91,8 @@ def get_data_pro():
         conn = connection_db()
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
+        graphical_productsb()
+        graphical_product()
         c.execute("select * from producto")
         rows_products = c.fetchall()
         return render_template("products.html",rows_p = rows_products)
@@ -327,11 +329,10 @@ def update_customer(id):
         conn.close()
     return redirect(url_for('show_menu')) 
 
-@app.route('/fig')
-def graphical_products():
+
+def graphical_product():
     try:
         conn = connection_db()
-        c = conn.cursor()
         conn.row_factory = lambda cursor, row: row[0]
         cantidad = c.execute('select cantidad value from producto').fetchall()
         c = c.execute("SELECT nombre FROM producto")
@@ -345,10 +346,11 @@ def graphical_products():
     finally:
         conn.close()
 
-@app.route('/grafi')
+
 def graphical_productsb():
     try:
         conn = connection_db()
+        conn.row_factory = lambda cursor, row: row[0]
         c = conn.cursor()
         cantidad = c.execute('select cantidad value from producto').fetchall()
         c = c.execute("SELECT nombre FROM producto")
@@ -373,14 +375,12 @@ def graphical_productsb():
             textcoords="offset points",
             ha='center', va='bottom')
             fig.tight_layout()
-            plt.savefig("static/image/productsb.png")
-
+            plt.savefig("static/image/productsbarra.png")
 
     except Exception as e:
         print(e)
     finally:
         conn.close()
-
 
 
 if __name__ == "__main__":
