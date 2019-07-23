@@ -8,7 +8,7 @@
 </div>
 
     <div class="col-xs-6" > 
-    <h3>Actualizar Producto</h3><br>
+    <h3>Actualizar Cliente</h3><br>
     
 <form action="/updatec/{{customert.0}}" method="post">
     <div class="form-group">
@@ -67,63 +67,3 @@
 
 
 
-
-
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>
-Editar de Cliente
-    </title>
-</head>
-<body>
-    <center>
-
-        <h2>Editar de Cliente</h2>
-
-    </center>
-    
-    <div align="center">
-    
-        <form action="/updatec/{{customert.0}}" method="post">
-                <label >Nombre: </label>
-                <input type="text"  name="name" value= "{{customert.1}}"  /><br><br>
-                <label >RFC: </label>
-                <input type="text"  name="rfc" value= "{{customert.2}}"/><br><br>
-                <label >Ciudad </label>
-                <input type="text"  name="city"value= "{{customert.3}}"/><br><br>
-                <label >Dirección </label>
-                <input type="text"  name="dire" value= "{{customert.4}}"/><br><br>
-                <input type="submit"  name="submit" value="Enviar" />
-              
-        </form>  
-    </div>
-
-<br>
-
-    <center>
-
-<form class="form-inline" method="POST" action="/funcion/{{customert.0}}" >
-        <div >
-          <div >
-              <span ><b>Selecciones sus productos</b></span>
-              <br><br>
-                  <select style="width:180px" style="high:100px"  name="ids_select" multiple>
-                    {% for row in rows %}
-                        <option  value="{{row["id"]}}" >{{row['nombre']}}</option>
-                    {% endfor %}
-                    {% for row in rows_pd %}
-                        <option  selected value="{{row["id"]}}" >{{row["producto"]}}</option>
-                    {% endfor %}
-                  </select>
-          </div>
-          <br>
-          <button type="submit">Almacenar</button>
-        </div>
-        
-      </form>
-    </center>
- 
-</body>
-</html>

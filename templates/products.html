@@ -37,8 +37,10 @@
                   </tr>
             {% endfor %}
    </table>
-   <img src="../static/image/productsc.png"alt=""> 
-   <img src="../static/image/productsbarra.png" alt="">
+   <img src=""alt="">
+   <img src="{{ url_for('static', filename='../static/image/' + circle) }}" />
+   <img src="{{ url_for('static', filename='../static/image/' + bar) }}" />
+
       
 </div> 
 <div class="col-xs-3">

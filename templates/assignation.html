@@ -2,16 +2,16 @@
 
 {% block container %}
 
-<div  class="col-xs-3">
+<div  class="col-xs-1">
 
 </div>
-<div class="col-xs-8" > 
+<div class="col-xs-6" > 
 
-   <h3>Nuevo Producto</h3><br>
- <img src="../static/image/productsbarras.png" alt="">
-   
-</div>  
-<div class="col-xs-3">
+   <h3>Productos Clientes</h3><br>
+
+   <img src="{{ url_for('static', filename='../static/image/' + lista) }}" height="550"/>
+</div> 
+<div class="col-xs-4">
 
 
 </div>
