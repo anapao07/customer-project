@@ -2,24 +2,19 @@
 <!-- Tabla Productos  -->
 
 {% block container %}
+<div class="col-xs-1" ></div> 
 
-<div  class="col-xs-3">
-
-</div>
-<div class="col-xs-6" > 
-
-   <h3>Productos Almacenados</h3><br>
+<div class="col-xs-10" > 
+<h3>Productos Almacenados</h3><br>
    
 <div class="row">
-
+ 
    <div class="pull-right">
-    <a href="/newproducts"> <button   class="btn btn-primary"><span class="glyphicon glyphicon-plus">Nuevo</span></button></a> 
-   </div>
+      <a href="/newproducts"> <button   class="btn btn-primary"><span class="glyphicon glyphicon-plus">Nuevo</span></button></a>  
 </div>
- 
-       
- 
-   <table class="table table-stripe" align="center">
+</div>
+<div style="width:750px; height:250px; overflow:auto;">
+   <table class="table table-stripe" align="center" height ="150px">
          <thead>
             <th scope="col">Nombre</th>
             <th scope="col">Descripción</th>
@@ -37,14 +32,13 @@
                   </tr>
             {% endfor %}
    </table>
-   <img src=""alt="">
-   <img src="{{ url_for('static', filename='../static/image/' + circle) }}" />
-   <img src="{{ url_for('static', filename='../static/image/' + bar) }}" />
-
+   </div>
+ 
+   <img src="{{ url_for('static', filename='../static/image/' +circle) }}"  />
+   <img src="{{ url_for('static', filename='../static/image/' + bar) }}"  />
       
 </div> 
-<div class="col-xs-3">
-
+<div class="col-xs-2">
 
 </div>
 {% endblock %}

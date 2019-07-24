@@ -4,10 +4,10 @@
 
 {% block container %}
 
-<div  class="col-xs-3">
+<div  class="col-xs-2">
 </div>
 
-    <div class="col-xs-6" > 
+    <div class="col-xs-10" > 
     <h3>Actualizar Cliente</h3><br>
     
 <form action="/updatec/{{customert.0}}" method="post">
@@ -31,7 +31,7 @@
               <span ><b>Selecciones sus productos</b></span>
               <br><br>
                 <div class="form-group">
-                    <select style="width:180px" style="high:100px"  class="form-control" name="ids_select" multiple>
+                    <select style="width:550px" style="high:100px"  class="form-control" name="ids_select" multiple>
                         {% for row in rows %}
                             <option  value="{{row["id"]}}"  >{{row['nombre']}}</option>
                         {% endfor %}
@@ -40,7 +40,7 @@
                         {% endfor %}
                     </select>
                  </div> 
-          <br>
+          <br><br>
           <button type="submit">Almacenar</button>
         </div>    
     </form>

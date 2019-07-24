@@ -387,12 +387,15 @@ def graphical_productsb():
 def graphical_customerspro():
     try:
         conn = connection_db()
+        
         c = conn.cursor()
         resutados_cliente_producto = c.execute("""SELECT c.nombre as cliente,
                 p.nombre as producto, p.cantidad FROM custom_prod AS cp
                 LEFT JOIN  customer as c on c.id = cp.customer_id 
                 LEFT JOIN producto as p on cp.product_id = p.id""").fetchall()
         productos = c.execute("SELECT nombre FROM producto").fetchall()
+        l =[num for elem in productos for num in elem]
+
         clientes = c.execute("SELECT nombre FROM customer").fetchall()
         # Generador que convierte las tuplas en lista 
         lista_todos_productos = [value[0] for value in productos]
@@ -408,7 +411,7 @@ def graphical_customerspro():
         values_clientes = {}    
         for value,key in zip(cliente_producto.values(), cliente_producto.keys()):
             values_clientes[key] = list(value.values())
-        category_names = productos
+        category_names = l
         results = values_clientes
         nombre = survey(results, category_names)
         return nombre
