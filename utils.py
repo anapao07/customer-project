@@ -5,6 +5,7 @@ import numpy as np
 from datetime import datetime
 import glob
 import os
+import sqlite3 
 
 
 def insert_product_customer(id,lista): 
@@ -21,7 +22,8 @@ def insert_product_customer(id,lista):
          print(e)
      finally:
          conn.close()  
-         def get_product_cust(id):
+
+def get_product_cust(id):
     try:
         conn = connection_db()
         conn.row_factory = sqlite3.Row
@@ -53,8 +55,6 @@ def get_product_p(id):
     finally:                                                                
         conn.close()        
 
-
-
 def get_data_cp():
     try:
         conn = connection_db()
@@ -71,7 +71,6 @@ def get_data_cp():
         print(e)
     finally:                                                                
         conn.close()
-
 
 def insert(dictionary):
     try:
