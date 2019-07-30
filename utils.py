@@ -1,6 +1,7 @@
 
 import matplotlib
 import matplotlib.pyplot as plt
+from flask import render_template
 import numpy as np	
 from datetime import datetime
 import glob
